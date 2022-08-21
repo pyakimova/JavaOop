@@ -1,5 +1,8 @@
 package ru.academits.pyakimova.range;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 public class Range {
     private double from;
     private double to;
@@ -46,39 +49,39 @@ public class Range {
         return value >= from && value <= to;
     }
 
-    public Range getIntersection(Range range1, Range range2) {
-        if (range1.to <= range2.from || range2.to <= range1.from) {
+    public Range getIntersection(Range range) {
+        if (this.to <= range.from || range.to <= this.from) {
             return null;
         }
 
-        return new Range(Math.max(range1.from,range2.from),Math.min(range1.to,range2.to));
+        return new Range(Math.max(this.from,range.from),Math.min(this.to,range.to));
     }
 
-    public Range[] getSum(Range range1, Range range2) {
-        if (range1.to <= range2.from || range2.to <= range1.from){
-            return new Range[]{range1,range2};
+    public Range[] getSum(Range range) {
+        if (this.to <= range.from || range.to <= this.from){
+            return new Range[]{this,range};
         }
 
-        return new Range[]{new Range(Math.min(range1.from,range2.from),Math.max(range1.to,range2.to))};
+        return new Range[]{new Range(Math.min(this.from,range.from),Math.max(this.to,range.to))};
     }
 
-    public Range[] getDifference(Range range1, Range range2) {
-        if (range1.to <= range2.from || range2.to <= range1.from) {
-            return new Range[]{range1};
+    public Range[] getMinus(Range range) {
+        if (this.to <= range.from || range.to <= this.from) {
+            return new Range[]{this};
         }
 
-        if (range2.from <= range1.from) {
-            if (range1.to <= range2.to) {
-                return new Range[]{};
-            } else {
-                return new Range[]{new Range(range2.to,range1.to)};
+        Range[] resultRange = new Range[]{};
+        if (this.from <= range.from) {
+            resultRange = Arrays.copyOf(resultRange,1);
+            resultRange[0] = new Range(this.from,range.from);
             }
+
+        if (range.to <= this.to) {
+            int newArrayLength = resultRange.length + 1;
+            resultRange = Arrays.copyOf(resultRange,newArrayLength);
+            resultRange[newArrayLength - 1] = new Range(range.to,this.to);
         }
 
-        if (range1.to <= range2.to) {
-            return new Range[]{new Range(range1.from,range2.from)};
-        }
-
-        return new Range[]{new Range(range1.from,range2.from),new Range(range2.to,range1.to)};
+        return resultRange;
     }
 }
